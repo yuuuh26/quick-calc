@@ -1,6 +1,6 @@
 const PREFIX = 'yuu-quick-calc-' + encodeURIComponent(self.registration.scope) + '-';
-const CACHE = PREFIX + 'v1.0.1';
-const FILES = ['./', './index.html', './style.css', './manifest.webmanifest', './js/app.js', './js/engine.js', './js/format.js', './js/model.js', './js/storage.js', './js/clipboard.js', './vendor/decimal.mjs', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/favicon.png', './icons/apple-touch-icon.png'];
+const CACHE = PREFIX + 'v1.0.2';
+const FILES = ['./', './index.html', './style.css', './manifest.webmanifest', './js/app.js', './js/engine.js', './js/format.js', './js/model.js', './js/storage.js', './js/clipboard.js', './js/install.js', './vendor/decimal.mjs', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/favicon.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith(PREFIX) && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', event => {

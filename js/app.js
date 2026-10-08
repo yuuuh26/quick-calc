@@ -3,7 +3,9 @@ import { formatValue } from './format.js';
 import { expressionText } from './engine.js';
 import { load, save } from './storage.js';
 import { copyCalculation, copyText } from './clipboard.js';
+import { setupInstall } from './install.js';
 const $ = id => document.getElementById(id);
+setupInstall({ button: $('install-app'), status: $('install-status'), help: $('install-help') });
 const loaded = load(), model = new Calculator(loaded.data);
 let theme = ['dark', 'light', 'system'].includes(loaded.data.theme) ? loaded.data.theme : 'system';
 let toastTimer, saveWarning = false;
@@ -27,7 +29,7 @@ function renderHistory() {
   }));
 }
 function fitResult() {
-  const result = $('result'), line = result.parentElement; let size = 44;
+  const result = $('result'), line = result.parentElement; let size = 48;
   result.style.fontSize = size + 'px';
   const available = line.clientWidth - $('equals-mark').getBoundingClientRect().width - 8;
   while (result.getBoundingClientRect().width > available && size > 16) result.style.fontSize = --size + 'px';

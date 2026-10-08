@@ -79,6 +79,21 @@ for (const [width,height] of [[320,568],[360,740],[412,915],[1280,900]]) {
 passed.push('320/360/412/1280pxで横スクロールなし・結果収まり・キーサイズ');
 await page.setViewportSize({width:360,height:740}); await page.keyboard.press('Escape'); await keys('12.5*8+320/4=');
 await page.locator('#about-open').click(); await page.locator('#theme').selectOption('light'); await page.locator('#about-close').click();
+await page.locator('#about-open').click();
+await page.evaluate(() => {
+  const event = new Event('beforeinstallprompt', {cancelable:true});
+  window.installPromptTestCount = 0;
+  event.prompt = async () => { window.installPromptTestCount++; };
+  event.userChoice = Promise.resolve({outcome:'accepted'});
+  window.dispatchEvent(event);
+});
+await page.locator('#install-app').click();
+await page.waitForFunction(() => document.querySelector('#install-status').textContent.includes('受け付けました'));
+assert.equal(await page.evaluate(() => window.installPromptTestCount),1);
+await page.evaluate(() => window.dispatchEvent(new Event('appinstalled')));
+assert.equal(await page.locator('#install-app').isEnabled(),false);
+await page.screenshot({path:'qa/install-about.png',fullPage:true});
+await page.locator('#about-close').click(); passed.push('アプリ内追加ボタン・合成イベントでの確認受付と完了表示（OSインストールは未確認）');
 await page.locator('#toast.visible').waitFor({state:'hidden'}); await page.screenshot({ path:'qa/mobile-light.png',fullPage:true });
 await page.setViewportSize({width:1280,height:900}); await page.screenshot({path:'qa/desktop-light.png',fullPage:true});
 await page.locator('#history-panel summary').click(); await page.locator('#history-list button').first().click(); await value('180'); passed.push('履歴再利用');
