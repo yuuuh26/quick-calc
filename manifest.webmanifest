@@ -1,0 +1,17 @@
+{
+  "id": "/quick-calc/",
+  "name": "QUICK CALC",
+  "short_name": "QUICK CALC",
+  "description": "計算式と途中結果が見える、画像コピー付きの電卓",
+  "lang": "ja",
+  "start_url": "/quick-calc/",
+  "scope": "/quick-calc/",
+  "display": "standalone",
+  "background_color": "#0b1320",
+  "theme_color": "#142033",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

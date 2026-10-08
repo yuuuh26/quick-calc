@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Calculator } from '../js/model.js';
+const enter = (calc, input) => { for (const key of input) calc.input(key); return calc; };
+test('途中結果と優先順位', () => {
+  const c = new Calculator(); enter(c,'12.5*8'); assert.equal(c.display,'100'); enter(c,'+320'); assert.equal(c.display,'420'); enter(c,'/4'); assert.equal(c.display,'180');
+});
+test('不完全な式をエラーにしない', () => { const c=enter(new Calculator(),'12+'); assert.equal(c.display,'12'); assert.equal(c.error,''); c.input('='); assert.equal(c.finalized,false); assert.equal(c.history.length,0); });
+test('確定後の数字で新規計算', () => { const c=enter(new Calculator(),'100+20=5'); assert.equal(c.text,'5'); assert.equal(c.display,'5'); });
+test('確定後の演算子で継続', () => { const c=enter(new Calculator(),'100+20=*2='); assert.equal(c.text,'120 × 2'); assert.equal(c.display,'240'); });
+test('継続計算で表示丸めを使わない', () => { const c=enter(new Calculator(),'1/3=*3='); assert.equal(c.display,'1'); assert.ok(c.result.gt('0.999999999999999999999999999999999999999')); });
+test('演算子を連続入力すると置換', () => { const c=enter(new Calculator(),'12+*/3='); assert.equal(c.text,'12 ÷ 3'); assert.equal(c.display,'4'); });
+test('重複小数点を拒否', () => { const c=enter(new Calculator(),'1.2.3'); assert.equal(c.text,'1.23'); });
+test('小数点で入力開始', () => { const c=enter(new Calculator(),'.5+.2='); assert.equal(c.display,'0.7'); });
+test('±を現在の数に適用', () => { const c=enter(new Calculator(),'12+3'); c.input('sign'); assert.equal(c.display,'9'); assert.equal(c.text,'12 + −3'); c.input('sign'); assert.equal(c.display,'15'); });
+test('演算子の後に負数を入力', () => { const c=enter(new Calculator(),'5*'); c.input('sign'); enter(c,'3='); assert.equal(c.display,'-15'); });
+test('ゼロから負数を入力', () => { const c=new Calculator(); c.input('sign'); enter(c,'1.5'); assert.equal(c.display,'-1.5'); });
+test('確定後の±', () => { const c=enter(new Calculator(),'2+3='); c.input('sign'); assert.equal(c.display,'-5'); });
+test('バックスペース: 数字、小数点、演算子、%', () => { const c=enter(new Calculator(),'1.2'); c.input('back'); assert.equal(c.text,'1.'); c.input('back'); assert.equal(c.text,'1'); c.input('+'); c.input('back'); assert.equal(c.text,'1'); c.input('%'); c.input('back'); assert.equal(c.text,'1'); c.input('back'); assert.equal(c.text,'0'); });
+test('0除算から削除で復旧', () => { const c=enter(new Calculator(),'10/0'); assert.equal(c.display,'Error'); assert.match(c.error,/0で割る/); c.input('back'); c.input('2'); assert.equal(c.display,'5'); c.input('AC'); assert.equal(c.display,'0'); });
+test('M+ / M− / MR / MC / AC', () => {
+  const c=enter(new Calculator(),'100*3='); c.input('M+'); assert.equal(c.memory.toString(),'300'); enter(c,'250*2='); c.input('M+'); assert.equal(c.memory.toString(),'800'); c.input('AC'); assert.equal(c.memory.toString(),'800'); c.input('MR'); assert.equal(c.display,'800'); c.input('M-'); assert.equal(c.memory.toString(),'0'); assert.equal(c.memoryUsed,true); c.input('MC'); assert.equal(c.memoryUsed,false); c.input('MR'); assert.equal(c.display,'0');
+});
+test('計算途中にMRを挿入', () => { const c=enter(new Calculator(),'20='); c.input('M+'); c.input('AC'); enter(c,'100+'); c.input('MR'); c.input('='); assert.equal(c.display,'120'); });
+test('Mの保存・復元', () => { const c=enter(new Calculator(),'0.1+0.2='); c.input('M+'); const restored=new Calculator(JSON.parse(JSON.stringify(c.snapshot()))); assert.equal(restored.memory.toString(),'0.3'); assert.equal(restored.memoryUsed,true); assert.equal(restored.history.length,1); restored.input('MR'); assert.equal(restored.display,'0.3'); });
+test('エラー値をメモリー保存しない', () => { const c=enter(new Calculator(),'1/0'); c.input('M+'); assert.equal(c.memoryUsed,false); });
+test('繰り返し=で履歴を複製しない', () => { const c=enter(new Calculator(),'1+2==='); assert.equal(c.history.length,1); });
+test('履歴を100件に制限', () => { const c=new Calculator(); for(let i=0;i<105;i++){enter(c,String(i)+'=');} assert.equal(c.history.length,100); assert.equal(c.history[0].result,'104'); assert.equal(c.history.at(-1).result,'5'); });
+test('履歴再利用で内部精度を保つ', () => { const c=enter(new Calculator(),'1/3='); c.input('AC'); c.reuse(0); assert.equal(c.result.toFixed(),'0.'+'3'.repeat(40)); enter(c,'*3='); assert.equal(c.display,'1'); });
+test('不正な保存データを拒否', () => { const c=new Calculator({memory:'Infinity',memoryUsed:true,history:[{tokens:[{raw:'1'}],result:'999'},{tokens:[{raw:'alert(1)'}],result:'1'}]}); assert.equal(c.memoryUsed,false); assert.equal(c.history.length,0); });
+test('長すぎる入力を拒否して復旧可能', () => { const c=enter(new Calculator(),'1'.repeat(90)); assert.equal(c.tokens[0].raw.length,80); c.input('AC'); assert.equal(c.display,'0'); });
+test('%を重複しない', () => { const c=enter(new Calculator(),'200+10%%'); assert.equal(c.display,'220'); c.input('back'); assert.equal(c.display,'210'); });

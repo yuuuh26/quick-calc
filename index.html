@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#142033">
+  <meta name="description" content="計算式と途中結果が見える、画像コピー付きの電卓。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>QUICK CALC</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <main class="calculator">
+    <header class="topbar">
+      <div class="brand">QUICK <span>CALC</span> <small>v1.0</small></div>
+      <button id="about-open" class="icon-button" aria-label="情報と設定">ⓘ</button>
+    </header>
+    <section class="display" aria-label="計算画面">
+      <div class="display-top"><span id="memory-indicator" hidden>M</span><span id="calculation-state">入力待ち</span></div>
+      <div id="expression" class="expression" aria-label="計算式">0</div>
+      <div class="answer-line"><span id="equals-mark" aria-hidden="true"></span><output id="result" aria-label="計算結果">0</output></div>
+      <div id="error" class="error" role="status"></div>
+    </section>
+    <button id="copy-calculation" class="copy-button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>計算画面をコピー</button>
+    <div class="keypad" aria-label="電卓キー">
+      <button data-key="MC" class="memory-key" aria-label="メモリーを消去">MC</button>
+      <button data-key="MR" class="memory-key" aria-label="メモリーを呼び出す">MR</button>
+      <button data-key="M+" class="memory-key" aria-label="結果をメモリーに加算">M+</button>
+      <button data-key="M-" class="memory-key" aria-label="結果をメモリーから減算">M−</button>
+      <button data-key="AC" class="utility clear-key">AC</button>
+      <button data-key="back" class="utility" aria-label="1文字削除">⌫</button>
+      <button data-key="%" class="utility">%</button>
+      <button data-key="/" class="operator" aria-label="割る">÷</button>
+      <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+      <button data-key="*" class="operator" aria-label="掛ける">×</button>
+      <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
+      <button data-key="-" class="operator" aria-label="引く">−</button>
+      <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
+      <button data-key="+" class="operator" aria-label="足す">+</button>
+      <button data-key="sign" class="utility" aria-label="正負を切り替える">±</button><button data-key="0">0</button><button data-key=".">.</button>
+      <button data-key="=" class="equal-key" aria-label="計算を確定">=</button>
+    </div>
+    <details id="history-panel" class="history-panel">
+      <summary>履歴 <span id="history-count">0</span></summary>
+      <div class="history-tools"><span>タップで再利用</span><button id="history-clear">すべて削除</button></div>
+      <p id="history-empty">確定した計算がここに残ります。</p>
+      <ol id="history-list"></ol>
+    </details>
+    <footer>Made by YUU</footer>
+  </main>
+  <dialog id="about">
+    <div class="dialog-heading"><h1>QUICK CALC <small>v1.0</small></h1><button id="about-close" class="icon-button" aria-label="情報を閉じる">×</button></div>
+    <p class="author">Made by YUU</p>
+    <label class="theme-label" for="theme">表示テーマ<select id="theme"><option value="system">端末に合わせる</option><option value="dark">ダーク</option><option value="light">ライト</option></select></label>
+    <p>内部40桁の10進数演算。結果は最大15有効桁で四捨五入して表示します。続けて計算するときは、内部の値を使います。</p>
+    <p>乗算・除算を先に計算します。加算・減算の直後の単独の%は、左側の計算結果に対する割合です。<br>200 + 10% = 220<br>200 × 10% = 20</p>
+    <p>M+ / M−は現在の結果を保存値へ加算・減算します。ACで保存値は消えません。</p>
+    <p>計算・履歴・メモリーはこの端末内で処理・保存します。サイトデータの削除や端末変更で、保存内容が失われることがあります。</p>
+    <p>ホーム画面に追加してアプリとして使えます。<span id="offline-status">オフライン利用を準備中です。</span></p>
+    <div class="url-box"><span id="url-label">公開URL</span><a id="public-url" href="https://yuuuh26.github.io/quick-calc/">https://yuuuh26.github.io/quick-calc/</a><button id="copy-url">URLをコピー</button></div>
+    <p class="license">Decimal.js v10.6.0 / MIT License<br>© 2025 Michael Mclaughlin</p>
+  </dialog>
+  <dialog id="delete-confirm"><h2>履歴をすべて削除する？</h2><p>Mメモリーは残ります。</p><div class="confirm-actions"><button id="delete-cancel">キャンセル</button><button id="delete-ok">削除する</button></div></dialog>
+  <dialog id="manual-copy"><div class="dialog-heading"><h2>テキストでコピー</h2><button id="manual-close" class="icon-button" aria-label="閉じる">×</button></div><p>ブラウザでコピーが許可されませんでした。下の文字を選択してコピーできます。</p><textarea id="manual-text" readonly aria-label="計算式と結果"></textarea></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
