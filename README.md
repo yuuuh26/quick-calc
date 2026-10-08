@@ -25,11 +25,11 @@ Decimal.js v10.6.0を同梱し、内部精度40有効桁、四捨五入（ROUND_
 
 ## 公開先
 
-予定URL：`https://yuuuh26.github.io/quick-calc/`
+公開URL：`https://yuuuh26.github.io/quick-calc/`
 
 リポジトリ：`yuuuh26/quick-calc`
 
-**このパッケージ作成時点ではGitHubへの反映・Pages公開は未完了です。** 公開後に予定URLへ直接アクセスして確認します。正常に起動すれば、確認のためだけにPages設定画面を開く必要はありません。
+**GitHubへの反映・Pages公開・公開URLでの起動確認は完了しています。** 公開版で小数演算、演算優先順位、メモリーと履歴の保持、コピー成功表示、オフライン準備完了を確認しました。主要16ファイルが検証済みのローカル版と一致しています。Android・Windows実機のインストールと、実アプリへの画像貼り付けは未確認です。
 
 GitHub Pagesは`main`ブランチのルートから配信する構成です。新規リポジトリを作成してソースを反映した後、Settings → Pages → Deploy from a branch → main / (root)で公開します。`index.html`や`manifest.webmanifest`をリポジトリ直下に置きます。計算履歴やメモリーはリポジトリへ送信されません。
 
